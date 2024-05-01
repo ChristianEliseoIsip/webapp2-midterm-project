@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAppDev2 - Midtern Project</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Honk&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <div class="title-container">
+            <h1>WEB APP DEVELOPMENT 2</h1>
+        </div>
+     
+        <form id="login-creds">
+            <label for="userN">Username:</label>
+            <input type="text" id="userN" placeholder="Type your username here:" required>
+            <label for="passW">Password:</label>
+            <input type="password" id="passW" placeholder="Type your password here:" required>
+            <button id="submit">Log In</button>
+        </form> 
+        <p id="hint">password: bsis2</p>
+    </div> 
+</body>
+
+<script>
+    document.getElementById("login-creds").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const names = document.getElementById("userN").value;
+        const pass = document.getElementById("passW").value;
+
+        fetch("https://jsonplaceholder.typicode.com/users")
+            .then(response => response.json())
+            .then(users => {
+                const name = users.find(user => user.username === names);
+                
+                if (name) {
+                    if (pass === "bsis2") {
+                        loadingOverlay();
+                        setTimeout(() => {
+                            window.location.href = "mainPage.html";
+                        }, 11500); 
+                    } else {
+                        popupOverlay("Incorrect password! --- Password: bsis2");
+                    }
+                } else {
+                    popupOverlay("Oops! The username you entered does not exist. Please double-check and try again!");
+                }
+            })
+            .catch(error => alert("Error fetching usernames:", error));
+    });
+
+    //Loading Overlay Function, a loading screen to Main Page.
+    function loadingOverlay() {
+
+        const loadingContainer = document.createElement("div");
+        loadingContainer.className = "loading";
+
+        const loadingText = document.createElement("h1");
+        loadingText.textContent = "Loading...";
+
+        const img = document.createElement("img");
+        img.src = "anime.webp";
+        img.alt = "Loading"; 
+
+        loadingContainer.appendChild(img);
+        loadingContainer.appendChild(loadingText);
+        document.body.appendChild(loadingContainer);
+    }
+
+    //Pop-up Overlay Function, a window pop-up to display error.
+    function popupOverlay(message) {
+
+        const overlayContainer = document.createElement("div");
+        overlayContainer.className = "overlay";
+
+        const overlayContent = document.createElement("div");
+        overlayContent.className = "overlay-content";
+        overlayContent.innerHTML = "<p>" + message + "</p>";
+
+        const retryButton = document.createElement("button");
+        retryButton.className = "back-btn"
+        retryButton.textContent = "Retry";
+        retryButton.addEventListener("click", () => {
+            window.location.href = "index.html";
+        });
+
+        document.body.appendChild(overlayContainer);
+        overlayContainer.appendChild(overlayContent);
+        overlayContent.appendChild(retryButton);
+
+    }
+</script>
+
+</html>

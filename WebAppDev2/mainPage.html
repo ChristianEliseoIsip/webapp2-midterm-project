@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="mainPage.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Honk&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="welcome-container">
+        <h1>WELCOME</h1>
+        <p>CHOOSE YOUR GAME!</p>
+        <button id="backButton">Log Out</button>
+    </div>
+
+    <div class="title-container">
+        <h1>GAME TITLES:</h1>
+        <ul id="titles"></ul>
+
+        <div class="btn-container">
+            <button id="back">Back</button>
+            <button id="next">Next</button>
+        </div>
+    </div>
+</body>
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const titleLists = document.getElementById("titles");
+        let currentPage = 1;
+        const titlesPerPage = 20;
+
+        fetch("https://jsonplaceholder.typicode.com/posts")
+            .then(response => response.json())
+            .then(posts => {
+                function displayTitles(startIndex) {
+                    const slice = posts.slice(startIndex, startIndex + titlesPerPage);
+                    slice.forEach(content => {
+                        const li = document.createElement("li");
+                        li.textContent = content.title;
+                        li.setAttribute("data-id", content.id);
+                        li.addEventListener("click", function() {
+                            const id = this.getAttribute("data-id");
+                            loadingOverlay();
+                            setTimeout(() => {
+                                window.location.href = `contentPage.html?id=${id}`;
+                            }, 1000);       
+                        });
+                        titleLists.appendChild(li);
+                    });
+                }
+
+                displayTitles(0); 
+
+        //I searched and asked AI for help to do the (next) and (back) button//
+        const next = document.getElementById("next");
+        const back = document.getElementById("back");
+
+        next.addEventListener("click", () => {
+            const startIndex = currentPage * titlesPerPage;
+
+            if (startIndex < posts.length) {
+                currentPage++;
+                titleLists.innerHTML = ""; 
+                displayTitles(startIndex);
+            } else {
+                alert("You've reached the last page!")
+            }
+        });
+
+        back.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                const startIndex = (currentPage - 1) * titlesPerPage;
+                titleLists.innerHTML = "";
+                displayTitles(startIndex);
+            } else {
+                alert("You are on the first page.");
+            }
+        });
+        })
+        .catch(error => console.error("Error fetching posts:", error));
+    });
+
+    //Button to go back to Log-in Page
+    document.getElementById("backButton").addEventListener("click", () => {
+        savingOverlay();
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 11500); 
+        
+    });
+
+    //Loading Overlay Function, a loading screen to a specific post.
+    function loadingOverlay() {
+
+        const loadingContainer = document.createElement("div");
+        loadingContainer.className = "loading";
+
+        const img = document.createElement("img");
+        img.src = "loadingprint.gif";
+        img.alt = "Loading"; 
+
+        loadingContainer.appendChild(img);
+        document.body.appendChild(loadingContainer);
+    }
+
+    //"Saving" Overlay Function, a loading screen when going back to Log-in page.
+    function savingOverlay() {
+
+        const savingContainer = document.createElement("div");
+        savingContainer.className = "saving";
+
+        const savingText = document.createElement("h1");
+        savingText.textContent = "Saving...";
+
+        const img = document.createElement("img");
+        img.src = "anime.webp";
+        img.alt = "Loading"; 
+
+        savingContainer.appendChild(img);
+        savingContainer.appendChild(savingText);
+        document.body.appendChild(savingContainer);
+    }
+
+</script>
+</html>
